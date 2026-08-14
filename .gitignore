@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+projects/*/audio/
+projects/*/images/
+projects/*/*.mp4
+projects/*/*.wav
+.DS_Store
+*.egg-info/
+models/
+.cache/

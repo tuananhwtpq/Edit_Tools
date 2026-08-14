@@ -1,0 +1,20 @@
+# Core
+pyyaml
+gradio
+python-dotenv
+requests
+
+# Script generation
+anthropic
+
+# TTS (added in buoi 3)
+# kokoro-onnx
+
+# Subtitles (added in buoi 4)
+# faster-whisper
+
+# Image gen fallback API (added in buoi 5)
+# fal-client
+
+# Video assembly (added in buoi 7)
+# moviepy

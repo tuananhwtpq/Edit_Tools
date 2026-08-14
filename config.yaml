@@ -1,0 +1,33 @@
+# Faceless AI Video Studio - config
+# Cac API key thuc su nam trong .env (khong commit), file nay chi khai bao lua chon.
+
+script:
+  provider: anthropic # anthropic | ollama
+  model: claude-sonnet-5
+  ollama_model: qwen2.5:7b
+  ollama_host: http://localhost:11434
+
+tts:
+  provider: kokoro # kokoro | chatterbox
+  voice: af_heart
+  speed: 1.0
+
+subtitle:
+  model_size: base.en # tiny.en | base.en | small.en | medium.en
+  burn_in: true
+
+image:
+  provider: local # local (ComfyUI+FLUX) | fal
+  fal_model: fal-ai/flux/dev
+  width: 1024
+  height: 1024
+
+video:
+  fps: 30
+  resolution: [1920, 1080]
+  ken_burns: true
+  background_music_volume: 0.15
+
+paths:
+  projects_dir: projects
+  assets_dir: assets
