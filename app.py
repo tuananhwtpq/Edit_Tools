@@ -6,6 +6,7 @@ from modules.config import CONFIG, PROJECTS_DIR
 from modules.project import slugify, save_script, load_script, save_audio_meta, project_dir, list_projects
 from modules.script_gen import generate_script
 from modules.tts_gen import generate_scene_audio
+from modules.subtitle_gen import generate_srt
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -66,6 +67,20 @@ def on_generate_voice(slug, voice, speed):
         f"Da sinh audio cho {len(result['scene_files'])} scene, "
         f"tong thoi luong {result['total_duration_sec']}s. Luu tai: {result['full_path']}"
     )
+
+
+def on_generate_subtitle(slug, max_words):
+    if not slug:
+        return "", "Chua chon project."
+    d = project_dir(slug)
+    audio_path = d / "audio" / "full.wav"
+    if not audio_path.exists():
+        return "", f"Chua co audio full.wav cho project '{slug}'. Hay sang tab Voice generate truoc."
+    out_path = d / "subtitle.srt"
+    entries = generate_srt(audio_path, out_path, max_words_per_line=int(max_words))
+    with open(out_path, "r") as f:
+        srt_content = f.read()
+    return srt_content, f"Da sinh {len(entries)} dong phu de. Luu tai: {out_path}"
 
 
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
@@ -129,6 +144,24 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
             on_generate_voice,
             inputs=[voice_project_in, voice_select_in, speed_in],
             outputs=[audio_out, voice_status],
+        )
+
+    with gr.Tab("3. Subtitle"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                sub_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
+                sub_refresh_btn = gr.Button("Refresh danh sach project")
+                max_words_in = gr.Slider(label="So tu toi da moi dong phu de", minimum=3, maximum=12, value=7, step=1)
+                generate_sub_btn = gr.Button("Generate subtitle (tu audio/full.wav)", variant="primary")
+                sub_status = gr.Markdown()
+            with gr.Column(scale=2):
+                sub_out = gr.Textbox(label="Subtitle .srt", lines=25)
+
+        sub_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[sub_project_in])
+        generate_sub_btn.click(
+            on_generate_subtitle,
+            inputs=[sub_project_in, max_words_in],
+            outputs=[sub_out, sub_status],
         )
 
     with gr.Tab("Projects"):

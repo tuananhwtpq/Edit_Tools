@@ -12,8 +12,8 @@ kokoro-onnx
 soundfile
 numpy
 
-# Subtitles (added in buoi 4)
-# faster-whisper
+# Subtitles
+faster-whisper
 
 # Image gen fallback API (added in buoi 5)
 # fal-client

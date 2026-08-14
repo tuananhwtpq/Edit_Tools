@@ -37,6 +37,14 @@ curl -L -o models/kokoro-v1.0.onnx https://github.com/thewh1teagle/kokoro-onnx/r
 curl -L -o models/voices-v1.0.bin https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
 ```
 
+Default voice: `af_heart`.
+
+### Subtitle generation (buoi 4)
+
+Uses `faster-whisper` (model `base.en` by default, downloads automatically from
+Hugging Face on first run) to transcribe `audio/full.wav` with word-level timestamps
+and produce `subtitle.srt`.
+
 ## Project structure
 
 - `app.py` - Gradio UI, orchestrates the pipeline
