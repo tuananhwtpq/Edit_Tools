@@ -1,32 +1,26 @@
 from modules.config import CONFIG
 
-_flux = None
+_backend = None
 
 
-def _get_flux():
-    global _flux
-    if _flux is None:
-        from mflux.models.common.config.model_config import ModelConfig
-        from mflux.models.flux.variants.txt2img.flux import Flux1
-
-        model_config = ModelConfig.from_name(CONFIG["image"]["model"])
-        _flux = Flux1(model_config=model_config, quantize=CONFIG["image"]["quantize"])
-    return _flux
+def _get_backend():
+    global _backend
+    if _backend is None:
+        name = CONFIG["image"]["backend"]
+        if name == "mlx":
+            from modules.image_backends import mlx_backend as _backend_module
+        elif name == "cuda":
+            from modules.image_backends import cuda_backend as _backend_module
+        else:
+            raise ValueError(f"Unknown image backend: {name} (chon 'mlx' hoac 'cuda' trong config.yaml)")
+        _backend = _backend_module
+    return _backend
 
 
 def generate_image(prompt: str, out_path, seed: int, width: int | None = None,
                     height: int | None = None, steps: int | None = None) -> str:
-    flux = _get_flux()
-    full_prompt = f"{prompt}, {CONFIG['image']['style_suffix']}"
-    image = flux.generate_image(
-        seed=seed,
-        prompt=full_prompt,
-        width=width or CONFIG["image"]["width"],
-        height=height or CONFIG["image"]["height"],
-        num_inference_steps=steps or CONFIG["image"]["steps"],
-    )
-    image.save(path=str(out_path))
-    return str(out_path)
+    backend = _get_backend()
+    return backend.generate_image(prompt, out_path, seed=seed, width=width, height=height, steps=steps)
 
 
 def generate_scene_images(scenes: list[dict], out_dir, base_seed: int = 0,

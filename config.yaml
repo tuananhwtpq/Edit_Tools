@@ -17,9 +17,10 @@ subtitle:
   burn_in: true
 
 image:
-  provider: local # local (mflux FLUX.1-schnell) | fal
+  provider: local # local | fal
+  backend: mlx # mlx (Mac Apple Silicon, dung mflux) | cuda (Windows/Linux NVIDIA, dung diffusers)
   model: schnell
-  quantize: 4 # 3|4|5|6|8 bit, 4 la lua chon can bang cho May 16GB RAM
+  quantize: 4 # 3|4|5|6|8 bit, chi ap dung cho backend mlx
   steps: 4
   width: 1024
   height: 1024

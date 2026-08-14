@@ -1,0 +1,9 @@
+# Image generation backend cho Windows/Linux co GPU NVIDIA (diffusers + PyTorch CUDA)
+# Neu "pip install torch" khong tu nhan CUDA, cai theo huong dan tai https://pytorch.org/get-started/locally/
+torch
+diffusers
+transformers
+accelerate
+bitsandbytes
+sentencepiece
+protobuf

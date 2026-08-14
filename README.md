@@ -9,17 +9,46 @@ Topic -> Script (LLM) -> Voiceover (TTS) -> Subtitles (Whisper) -> Images (FLUX/
 
 ## Setup
 
+### macOS (Apple Silicon)
+
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # fill in ANTHROPIC_API_KEY / FAL_KEY if needed
+pip install -r requirements.txt -r requirements-mac.txt
+cp .env.example .env   # fill in ANTHROPIC_API_KEY / FAL_KEY / HF_TOKEN if needed
 python app.py
 ```
 
 > macOS 26.x note: if you hit a `pyexpat` / `libexpat` symbol error with Homebrew's
 > `python@3.12`, run `brew install expat` — `.venv/bin/activate` already exports
 > `DYLD_LIBRARY_PATH` to point at it.
+
+Set `image.backend: mlx` in `config.yaml` (default).
+
+### Windows / Linux (NVIDIA GPU)
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt -r requirements-cuda.txt
+copy .env.example .env
+python app.py
+```
+
+Set `image.backend: cuda` in `config.yaml`. Also needed:
+- `ffmpeg` with libass/subtitle support (most prebuilt Windows binaries, e.g. from
+  https://www.gyan.dev/ffmpeg/builds/, already include this — unlike the plain
+  Homebrew `ffmpeg` formula on Mac) on PATH
+- `espeak-ng` Windows installer (for Kokoro TTS phonemization):
+  https://github.com/espeak-ng/espeak-ng/releases
+- Ollama for Windows if using local script generation: https://ollama.com/download
+
+The CUDA image backend ([modules/image_backends/cuda_backend.py](modules/image_backends/cuda_backend.py))
+uses `diffusers` + 4-bit bitsandbytes quantization + CPU offload to fit FLUX.1-schnell
+on consumer GPUs (~8GB+ VRAM). **Not yet verified on real NVIDIA hardware** — if you
+hit an out-of-memory error, try `enable_sequential_cpu_offload()` instead of
+`enable_model_cpu_offload()` in that file (slower, less VRAM), or lower
+`image.width`/`image.height` in `config.yaml`.
 
 ### Script generation (buoi 2)
 

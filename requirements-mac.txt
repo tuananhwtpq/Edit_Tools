@@ -1,0 +1,2 @@
+# Image generation backend cho macOS Apple Silicon (mflux = MLX native FLUX)
+mflux
