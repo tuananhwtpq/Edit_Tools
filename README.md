@@ -112,6 +112,28 @@ brew install ffmpeg-full
 Optional background music: drop an `.mp3` into `assets/music/` and enable
 "Them nhac nen" in the Video tab.
 
+## Sticker Dialogue mode (buoi 9+)
+
+A second, parallel mode alongside the narrator/ffmpeg pipeline above: 2 fixed
+recurring characters (Host/Guest, configured in `config.yaml` -> `characters`)
+have a back-and-forth dialogue instead of one narrator. Final assembly is meant
+to go through CapCut (via `pycapcut`, added in buoi 12) instead of ffmpeg, to
+keep the finishing/export step token-free.
+
+- `modules/character_gen.py`: draws each character as a simple black-outline
+  stick figure (round head, oval torso, jointed limbs) with 5 expressions
+  (`neutral`, `talking`, `happy`, `surprised`, `angry`) using pure PIL — no AI,
+  so every expression is pixel-consistent. A small colored necktie
+  distinguishes Host vs Guest. Generate via the **6. Characters** tab.
+- `modules/dialogue_script_gen.py`: generates a 2-character dialogue script
+  (`mode: "dialogue"` in the JSON, `lines[]` per scene with `speaker` +
+  `expression`), normalizing any expression/speaker the LLM gets wrong back to
+  a valid one. Generate via the **7. Dialogue Script** tab.
+
+Still to build: per-line dialogue voice generation, duration-based subtitle
+timing (no whisper needed since the text is already known), and CapCut draft
+export.
+
 ## Project structure
 
 - `app.py` - Gradio UI, orchestrates the pipeline

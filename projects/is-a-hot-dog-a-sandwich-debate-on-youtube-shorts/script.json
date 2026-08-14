@@ -1,0 +1,101 @@
+{
+  "mode": "dialogue",
+  "title": "Is a Hot Dog a Sandwich? | Debate on YouTube Shorts",
+  "characters": [
+    "Host",
+    "Guest"
+  ],
+  "scenes": [
+    {
+      "scene_id": 1,
+      "background_prompt": "A simple flat illustration of a hot dog and a sandwich, with no characters present.",
+      "lines": [
+        {
+          "line_id": 1,
+          "speaker": "Host",
+          "text": "Hey there! Today we’re tackling a question that has been debated by food enthusiasts everywhere: is a hot dog a sandwich?",
+          "expression": "surprised"
+        },
+        {
+          "line_id": 2,
+          "speaker": "Guest",
+          "text": "Absolutely! Let’s dive in!",
+          "expression": "happy"
+        }
+      ]
+    },
+    {
+      "scene_id": 2,
+      "background_prompt": "Flat illustration of two food items side by side: a hot dog and an open sandwich.",
+      "lines": [
+        {
+          "line_id": 3,
+          "speaker": "Host",
+          "text": "Now, the argument is that both contain meat between bread.",
+          "expression": "neutral"
+        },
+        {
+          "line_id": 4,
+          "speaker": "Guest",
+          "text": "True, but sandwiches are typically served open-faced. Hot dogs have a casing!",
+          "expression": "happy"
+        }
+      ]
+    },
+    {
+      "scene_id": 3,
+      "background_prompt": "Flat illustration of a hot dog bun and a sandwich bun.",
+      "lines": [
+        {
+          "line_id": 5,
+          "speaker": "Host",
+          "text": "Okay, but what about the bun? Is it enough to make it a sandwich?",
+          "expression": "neutral"
+        },
+        {
+          "line_id": 6,
+          "speaker": "Guest",
+          "text": "In sandwiches, the bread usually touches the top and bottom of the meat. Hot dogs often just slide right in!",
+          "expression": "happy"
+        }
+      ]
+    },
+    {
+      "scene_id": 4,
+      "background_prompt": "Flat illustration of a hot dog on a bun with condiments.",
+      "lines": [
+        {
+          "line_id": 7,
+          "speaker": "Host",
+          "text": "I get that. But what about the toppings? They’re basically the same, right?",
+          "expression": "neutral"
+        },
+        {
+          "line_id": 8,
+          "speaker": "Guest",
+          "text": "That’s debatable! Some hot dogs have ketchup and mustard; others might just be spicy sausages!",
+          "expression": "happy"
+        }
+      ]
+    },
+    {
+      "scene_id": 5,
+      "background_prompt": "Flat illustration of various condiments on a sandwich and a hot dog.",
+      "lines": [
+        {
+          "line_id": 9,
+          "speaker": "Host",
+          "text": "Alright, let’s wrap this up. What’s the final call?",
+          "expression": "neutral"
+        },
+        {
+          "line_id": 10,
+          "speaker": "Guest",
+          "text": "Well, it depends on your definition of a sandwich! But in my book, nope—it’s definitely not a sandwich!",
+          "expression": "happy"
+        }
+      ]
+    }
+  ],
+  "outro_cta": "Host: So, what do you think? Join the debate and leave your thoughts in the comments below. Don’t forget to like and subscribe for more fun food debates!"
+}

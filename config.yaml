@@ -36,3 +36,17 @@ video:
 paths:
   projects_dir: projects
   assets_dir: assets
+
+# Che do "Sticker Dialogue": 2 nhan vat co dinh, ve bang code (khong AI) de dam bao
+# nhat quan tuyet doi giua cac bieu cam. Doi mau/giong o day, khong can sua code.
+characters:
+  - name: Host
+    color: "#3B82F6" # xanh duong
+    voice: af_heart
+    side: left
+    personality: curious, slightly skeptical, asks good follow-up questions
+  - name: Guest
+    color: "#F97316" # cam
+    voice: am_adam
+    side: right
+    personality: enthusiastic, knowledgeable, a bit of a smartass, likes to over-explain

@@ -9,6 +9,8 @@ from modules.tts_gen import generate_scene_audio
 from modules.subtitle_gen import generate_srt
 from modules.image_gen import generate_image
 from modules.video_assembly import assemble_video, generate_thumbnail
+from modules.character_gen import generate_all_characters, EXPRESSIONS
+from modules.dialogue_script_gen import generate_dialogue_script
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -173,6 +175,25 @@ def on_generate_thumbnail(slug, scene_choice):
     return str(out_path), f"Da tao thumbnail: {out_path}"
 
 
+def on_generate_characters():
+    paths = generate_all_characters()
+    gallery = []
+    for char_name, exprs in paths.items():
+        for expr, p in exprs.items():
+            gallery.append((p, f"{char_name} - {expr}"))
+    names = ", ".join(paths.keys())
+    return gallery, f"Da sinh sticker cho: {names} ({len(EXPRESSIONS)} bieu cam moi nguoi)."
+
+
+def on_generate_dialogue(topic, duration_min, provider):
+    if not topic.strip():
+        return "", "Vui long nhap chu de.", ""
+    script = generate_dialogue_script(topic=topic, target_duration_min=duration_min, provider=provider)
+    slug = slugify(script.get("title", topic))
+    script_str = json.dumps(script, indent=2, ensure_ascii=False)
+    return script_str, f"Da tao dialogue script cho project: **{slug}**", slug
+
+
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
     gr.Markdown("# Faceless AI Video Studio")
 
@@ -308,6 +329,41 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
             inputs=[vid_project_in, thumb_scene_in],
             outputs=[thumb_out, thumb_status],
         )
+
+    with gr.Tab("7. Dialogue Script"):
+        gr.Markdown("Che do **Sticker Dialogue**: kich ban hoi thoai 2 nhan vat co dinh (Host/Guest).")
+        with gr.Row():
+            with gr.Column(scale=1):
+                dlg_topic_in = gr.Textbox(label="Chu de video", placeholder="Vi du: Is a hot dog a sandwich?")
+                dlg_duration_in = gr.Slider(label="Do dai mong muon (phut)", minimum=0.5, maximum=10, value=1.5, step=0.5)
+                dlg_provider_in = gr.Radio(
+                    label="Script provider", choices=["ollama", "anthropic"],
+                    value=CONFIG["script"]["provider"] if CONFIG["script"]["provider"] in ("ollama", "anthropic") else "ollama",
+                )
+                dlg_generate_btn = gr.Button("Generate dialogue script", variant="primary")
+                dlg_status_out = gr.Markdown()
+            with gr.Column(scale=2):
+                dlg_script_out = gr.Textbox(label="Dialogue script (JSON, co the sua tay)", lines=30)
+                dlg_slug_state = gr.State("")
+                dlg_save_btn = gr.Button("Save script vao project")
+                dlg_save_status = gr.Markdown()
+
+        dlg_generate_btn.click(
+            on_generate_dialogue,
+            inputs=[dlg_topic_in, dlg_duration_in, dlg_provider_in],
+            outputs=[dlg_script_out, dlg_status_out, dlg_slug_state],
+        )
+        dlg_save_btn.click(on_save_script, inputs=[dlg_script_out, dlg_slug_state], outputs=[dlg_save_status])
+
+    with gr.Tab("6. Characters"):
+        gr.Markdown(
+            "Nhan vat co dinh cho che do **Sticker Dialogue** (dinh nghia trong `config.yaml` -> `characters`). "
+            "Ve bang code (khong AI) de dam bao nhat quan tuyet doi giua cac bieu cam."
+        )
+        char_status = gr.Markdown()
+        generate_char_btn = gr.Button("Generate / Regenerate characters", variant="primary")
+        char_gallery = gr.Gallery(label="Nhan vat x bieu cam", columns=5, object_fit="contain")
+        generate_char_btn.click(on_generate_characters, outputs=[char_gallery, char_status])
 
     with gr.Tab("Projects"):
         refresh_btn = gr.Button("Refresh danh sach project")
