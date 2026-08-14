@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run app.py (Gradio UI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "DYLD_LIBRARY_PATH": "/opt/homebrew/opt/expat/lib"
+      }
+    }
+  ]
+}
