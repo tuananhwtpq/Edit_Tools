@@ -253,14 +253,15 @@ def on_export_capcut(slug):
     if missing_bg:
         return f"Thieu anh nen cho scene: {missing_bg}. Hay generate o phan tren truoc."
 
-    draft_path = build_dialogue_draft(
+    result = build_dialogue_draft(
         scene_timings=audio_meta["scene_timings"],
         line_timings=audio_meta["line_timings"],
         backgrounds_dir=d / "images",
         srt_path=d / "subtitle.srt",
-        out_path=d / "capcut_draft.json",
+        draft_name=slug,
+        fallback_out_path=d / "capcut_draft.json",
     )
-    return f"Da xuat draft CapCut: {draft_path}\n\nMo CapCut, dung tinh nang import/mo draft de tiep tuc chinh sua."
+    return f"{result['message']}\n\nPath: {result['path']}"
 
 
 with gr.Blocks(title="Faceless AI Video Studio") as demo:

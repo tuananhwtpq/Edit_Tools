@@ -143,12 +143,14 @@ keep the finishing/export step token-free.
   `.json` with 5 tracks — Background, one video track per character (sticker
   swaps per line: speaking character shows their line's expression, the other
   shows `neutral`), Dialogue audio, Subtitle text (via `import_srt`). Generate
-  via **9. Export CapCut** — writes `capcut_draft.json` into the project folder.
-  **Not yet placed into an actual CapCut drafts folder** (CapCut isn't installed
-  on this Mac to test against) — for now, manually import/open the generated
-  `.json` in CapCut. Once we know which machine/CapCut install you'll actually
-  use, this can auto-place the draft via `pycapcut`'s `DraftFolder` so it shows
-  up directly in the CapCut project list.
+  via **9. Export CapCut** — writes directly into CapCut's own drafts folder
+  (`~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<project-slug>/` on
+  macOS, `%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\` on
+  Windows — Windows path unverified, adjust `default_capcut_drafts_dir()` in
+  `modules/capcut_export.py` if CapCut's actual folder differs there) so the
+  project shows up directly in CapCut's project list — no manual import. Falls
+  back to writing a standalone `capcut_draft.json` in the project folder if
+  that drafts folder isn't found.
 
 ## Project structure
 

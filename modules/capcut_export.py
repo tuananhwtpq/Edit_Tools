@@ -1,8 +1,11 @@
-"""Xuat draft CapCut (.json) tu dialogue script + audio timing + anh nen + sticker
-nhan vat, dung thu vien pycapcut. Khong render video - nguoi dung mo file draft nay
-trong CapCut de chinh sua/hoan thien/export, tiet kiem token thay vi render qua ffmpeg.
+"""Xuat draft CapCut tu dialogue script + audio timing + anh nen + sticker nhan vat,
+dung thu vien pycapcut. Ghi thang vao thu muc drafts cua CapCut de mo app la thay
+project ngay, khong can import thu cong. Khong render video - nguoi dung mo CapCut
+de chinh sua/hoan thien/export, tiet kiem token thay vi render qua ffmpeg.
 """
 
+import os
+import platform
 from pathlib import Path
 
 import pycapcut as cc
@@ -14,13 +17,19 @@ def _sec(value: float) -> str:
     return f"{value}s"
 
 
-def build_dialogue_draft(scene_timings: list[dict], line_timings: list[dict], backgrounds_dir: Path,
-                          srt_path: Path, out_path: Path, characters: list[dict] | None = None) -> str:
-    characters = characters or CONFIG["characters"]
-    width, height = CONFIG["video"]["resolution"]
-    fps = CONFIG["video"]["fps"]
+def default_capcut_drafts_dir() -> Path | None:
+    system = platform.system()
+    if system == "Darwin":
+        return Path.home() / "Movies" / "CapCut" / "User Data" / "Projects" / "com.lveditor.draft"
+    if system == "Windows":
+        local_appdata = os.environ.get("LOCALAPPDATA", "")
+        if local_appdata:
+            return Path(local_appdata) / "CapCut" / "User Data" / "Projects" / "com.lveditor.draft"
+    return None
 
-    draft = cc.ScriptFile(width, height, fps)
+
+def _build_tracks(draft: "cc.ScriptFile", scene_timings: list[dict], line_timings: list[dict],
+                   backgrounds_dir: Path, srt_path: Path, characters: list[dict]):
     draft.add_track(cc.TrackType.video, "Background")
     for char in characters:
         draft.add_track(cc.TrackType.video, char["name"])
@@ -57,6 +66,35 @@ def build_dialogue_draft(scene_timings: list[dict], line_timings: list[dict], ba
     if srt_path and Path(srt_path).exists():
         draft.import_srt(str(srt_path), "Subtitle")
 
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    draft.dump(str(out_path))
-    return str(out_path)
+
+def build_dialogue_draft(scene_timings: list[dict], line_timings: list[dict], backgrounds_dir: Path,
+                          srt_path: Path, draft_name: str, fallback_out_path: Path,
+                          characters: list[dict] | None = None, drafts_dir: Path | None = None) -> dict:
+    characters = characters or CONFIG["characters"]
+    width, height = CONFIG["video"]["resolution"]
+    fps = CONFIG["video"]["fps"]
+
+    drafts_dir = drafts_dir or default_capcut_drafts_dir()
+    if drafts_dir and drafts_dir.exists():
+        folder = cc.DraftFolder(str(drafts_dir))
+        draft = folder.create_draft(draft_name, width, height, fps, allow_replace=True)
+        _build_tracks(draft, scene_timings, line_timings, backgrounds_dir, srt_path, characters)
+        draft.save()
+        return {
+            "location": "capcut_drafts_folder",
+            "path": str(drafts_dir / draft_name),
+            "message": f"Da ghi truc tiep vao thu muc CapCut. Mo CapCut, project '{draft_name}' se hien san trong danh sach.",
+        }
+
+    draft = cc.ScriptFile(width, height, fps)
+    _build_tracks(draft, scene_timings, line_timings, backgrounds_dir, srt_path, characters)
+    fallback_out_path.parent.mkdir(parents=True, exist_ok=True)
+    draft.dump(str(fallback_out_path))
+    return {
+        "location": "file",
+        "path": str(fallback_out_path),
+        "message": (
+            f"Khong tim thay thu muc drafts cua CapCut, da xuat ra file rieng: {fallback_out_path}. "
+            "Ban can tu import file nay vao CapCut."
+        ),
+    }
