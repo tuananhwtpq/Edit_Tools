@@ -33,6 +33,20 @@ def load_script(slug: str) -> dict:
         return json.load(f)
 
 
+def save_audio_meta(slug: str, meta: dict) -> str:
+    d = project_dir(slug)
+    path = d / "audio_meta.json"
+    with open(path, "w") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+    return str(path)
+
+
+def load_audio_meta(slug: str) -> dict:
+    path = project_dir(slug) / "audio_meta.json"
+    with open(path, "r") as f:
+        return json.load(f)
+
+
 def list_projects() -> list[str]:
     if not PROJECTS_DIR.exists():
         return []

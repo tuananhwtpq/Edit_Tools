@@ -7,8 +7,10 @@ requests
 # Script generation
 anthropic
 
-# TTS (added in buoi 3)
-# kokoro-onnx
+# TTS
+kokoro-onnx
+soundfile
+numpy
 
 # Subtitles (added in buoi 4)
 # faster-whisper

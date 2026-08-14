@@ -21,6 +21,22 @@ python app.py
 > `python@3.12`, run `brew install expat` — `.venv/bin/activate` already exports
 > `DYLD_LIBRARY_PATH` to point at it.
 
+### Script generation (buoi 2)
+
+- Local/free: `brew install ollama && ollama pull qwen2.5:7b` (default provider in `config.yaml`)
+- Higher quality: set `ANTHROPIC_API_KEY` in `.env` and switch `script.provider: anthropic`
+
+### Voice generation (buoi 3)
+
+Uses [Kokoro-82M](https://github.com/thewh1teagle/kokoro-onnx) locally (free, no API key).
+
+```bash
+brew install espeak-ng
+mkdir -p models
+curl -L -o models/kokoro-v1.0.onnx https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
+curl -L -o models/voices-v1.0.bin https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+```
+
 ## Project structure
 
 - `app.py` - Gradio UI, orchestrates the pipeline

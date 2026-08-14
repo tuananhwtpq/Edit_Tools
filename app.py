@@ -3,10 +3,17 @@ import json
 import gradio as gr
 
 from modules.config import CONFIG, PROJECTS_DIR
-from modules.project import slugify, save_script, list_projects
+from modules.project import slugify, save_script, load_script, save_audio_meta, project_dir, list_projects
 from modules.script_gen import generate_script
+from modules.tts_gen import generate_scene_audio
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
+
+KOKORO_VOICES = [
+    "af_heart", "af_bella", "af_nicole", "af_sarah",
+    "am_adam", "am_michael", "am_onyx",
+    "bf_emma", "bm_george",
+]
 
 
 def on_generate_script(topic, style, duration_min, provider):
@@ -32,6 +39,33 @@ def on_save_script(script_str, slug):
         return f"JSON khong hop le: {e}"
     path = save_script(slug, script)
     return f"Da luu: {path}"
+
+
+def on_load_script_for_voice(slug):
+    if not slug:
+        return "Chua chon project.", ""
+    try:
+        script = load_script(slug)
+    except FileNotFoundError:
+        return f"Khong tim thay script.json cho project '{slug}'.", ""
+    lines = [f"[{s['scene_id']}] {s['narration']}" for s in script.get("scenes", [])]
+    return f"Da load {len(lines)} scene tu project **{slug}**.", "\n\n".join(lines)
+
+
+def on_generate_voice(slug, voice, speed):
+    if not slug:
+        return None, "Chua chon project."
+    try:
+        script = load_script(slug)
+    except FileNotFoundError:
+        return None, f"Khong tim thay script.json cho project '{slug}'."
+    d = project_dir(slug)
+    result = generate_scene_audio(script["scenes"], d / "audio", voice=voice, speed=speed)
+    save_audio_meta(slug, result)
+    return result["full_path"], (
+        f"Da sinh audio cho {len(result['scene_files'])} scene, "
+        f"tong thoi luong {result['total_duration_sec']}s. Luu tai: {result['full_path']}"
+    )
 
 
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
@@ -68,6 +102,33 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
             on_save_script,
             inputs=[script_out, slug_state],
             outputs=[save_status],
+        )
+
+    with gr.Tab("2. Voice"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                voice_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
+                voice_refresh_btn = gr.Button("Refresh danh sach project")
+                load_script_btn = gr.Button("Load script")
+                voice_load_status = gr.Markdown()
+                voice_select_in = gr.Dropdown(label="Kokoro voice", choices=KOKORO_VOICES, value=CONFIG["tts"]["voice"])
+                speed_in = gr.Slider(label="Toc do doc", minimum=0.5, maximum=1.5, value=CONFIG["tts"]["speed"], step=0.05)
+                generate_voice_btn = gr.Button("Generate voice", variant="primary")
+                voice_status = gr.Markdown()
+            with gr.Column(scale=2):
+                scenes_preview = gr.Textbox(label="Noi dung scene (tu script da luu)", lines=15, interactive=False)
+                audio_out = gr.Audio(label="Audio full (tat ca scene ghep lai)", type="filepath")
+
+        voice_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[voice_project_in])
+        load_script_btn.click(
+            on_load_script_for_voice,
+            inputs=[voice_project_in],
+            outputs=[voice_load_status, scenes_preview],
+        )
+        generate_voice_btn.click(
+            on_generate_voice,
+            inputs=[voice_project_in, voice_select_in, speed_in],
+            outputs=[audio_out, voice_status],
         )
 
     with gr.Tab("Projects"):
