@@ -15,7 +15,10 @@ numpy
 # Subtitles
 faster-whisper
 
-# Image gen fallback API (added in buoi 5)
+# Image generation (mflux = MLX native FLUX, chay local tren Apple Silicon)
+mflux
+
+# Image gen fallback API (chua dung, de danh khi can)
 # fal-client
 
 # Video assembly (added in buoi 7)

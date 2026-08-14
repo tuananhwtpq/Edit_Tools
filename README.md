@@ -45,6 +45,26 @@ Uses `faster-whisper` (model `base.en` by default, downloads automatically from
 Hugging Face on first run) to transcribe `audio/full.wav` with word-level timestamps
 and produce `subtitle.srt`.
 
+### Image generation (buoi 5-6)
+
+Uses [mflux](https://github.com/filipstrand/mflux) (MLX-native FLUX) to run
+**FLUX.1-schnell** locally on Apple Silicon, 4-bit quantized. No API key needed for
+inference, but the model repo on Hugging Face is gated (free, Apache-2.0, just
+requires accepting terms):
+
+1. Create a free account at https://huggingface.co/join
+2. Visit https://huggingface.co/black-forest-labs/FLUX.1-schnell and click
+   "Agree and access repository"
+3. Create a Read token at https://huggingface.co/settings/tokens and set
+   `HF_TOKEN=hf_...` in `.env`
+
+First run downloads ~13GB of weights (needs ~45GB free disk space temporarily).
+On an M4 Mac mini (16GB RAM, no discrete GPU): ~1 min/image at 512x512,
+~4-5 min/image at 1024x1024. Style consistency across scenes is kept simple —
+a shared `style_suffix` (see `config.yaml`) is appended to every prompt; no LoRA
+character training (would need a training pipeline + reference images, out of
+scope for now).
+
 ## Project structure
 
 - `app.py` - Gradio UI, orchestrates the pipeline

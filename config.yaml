@@ -17,10 +17,14 @@ subtitle:
   burn_in: true
 
 image:
-  provider: local # local (ComfyUI+FLUX) | fal
-  fal_model: fal-ai/flux/dev
+  provider: local # local (mflux FLUX.1-schnell) | fal
+  model: schnell
+  quantize: 4 # 3|4|5|6|8 bit, 4 la lua chon can bang cho May 16GB RAM
+  steps: 4
   width: 1024
   height: 1024
+  style_suffix: "cinematic documentary style, natural lighting, high detail, no text, no watermark"
+  fal_model: fal-ai/flux/dev
 
 video:
   fps: 30
