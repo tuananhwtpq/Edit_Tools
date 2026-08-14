@@ -2,12 +2,13 @@ import json
 
 import gradio as gr
 
-from modules.config import CONFIG, PROJECTS_DIR
-from modules.project import slugify, save_script, load_script, save_audio_meta, project_dir, list_projects
+from modules.config import CONFIG, PROJECTS_DIR, ASSETS_DIR
+from modules.project import slugify, save_script, load_script, save_audio_meta, load_audio_meta, project_dir, list_projects
 from modules.script_gen import generate_script
 from modules.tts_gen import generate_scene_audio
 from modules.subtitle_gen import generate_srt
 from modules.image_gen import generate_image
+from modules.video_assembly import assemble_video, generate_thumbnail
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -115,6 +116,63 @@ def on_generate_images(slug, base_seed, width, height):
     yield gallery, f"Hoan tat! Da sinh {len(scenes)} anh cho project '{slug}'."
 
 
+def on_assemble_video(slug, use_subtitle, use_music):
+    if not slug:
+        yield None, "Chua chon project."
+        return
+    d = project_dir(slug)
+    try:
+        script = load_script(slug)
+        audio_meta = load_audio_meta(slug)
+    except FileNotFoundError as e:
+        yield None, f"Thieu du lieu: {e}"
+        return
+
+    images_dir = d / "images"
+    missing = [s["scene_id"] for s in script["scenes"] if not (images_dir / f"scene_{s['scene_id']:02d}.png").exists()]
+    if missing:
+        yield None, f"Thieu anh cho scene: {missing}. Hay sang tab 4. Images generate truoc."
+        return
+
+    def progress(i, total, scene_id, stage):
+        pass
+
+    stages = {"ken-burns": "Dang tao hieu ung Ken Burns tung scene...", "concat": "Dang ghep cac scene...",
+              "audio": "Dang ghep am thanh...", "subtitle": "Dang burn phu de...", "done": "Da xong."}
+    yield None, stages["ken-burns"]
+
+    srt_path = d / "subtitle.srt"
+    music_files = list((ASSETS_DIR / "music").glob("*.mp3")) if use_music else []
+
+    out_path = assemble_video(
+        scenes=script["scenes"],
+        scene_timings=audio_meta["scene_timings"],
+        images_dir=images_dir,
+        audio_full_path=audio_meta["full_path"],
+        out_path=d / "output.mp4",
+        srt_path=srt_path if use_subtitle and srt_path.exists() else None,
+        music_path=str(music_files[0]) if music_files else None,
+        progress_cb=lambda i, total, sid, stage: None,
+    )
+    yield out_path, f"Hoan tat! Video luu tai: {out_path}"
+
+
+def on_generate_thumbnail(slug, scene_choice):
+    if not slug:
+        return None, "Chua chon project."
+    d = project_dir(slug)
+    try:
+        script = load_script(slug)
+    except FileNotFoundError:
+        return None, f"Khong tim thay script.json cho project '{slug}'."
+    img_path = d / "images" / f"scene_{int(scene_choice):02d}.png"
+    if not img_path.exists():
+        return None, f"Chua co anh cho scene {scene_choice}."
+    out_path = d / "thumbnail.png"
+    generate_thumbnail(img_path, out_path, script["title"])
+    return str(out_path), f"Da tao thumbnail: {out_path}"
+
+
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
     gr.Markdown("# Faceless AI Video Studio")
 
@@ -220,6 +278,35 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
             on_generate_images,
             inputs=[img_project_in, seed_in, width_in, height_in],
             outputs=[gallery_out, img_status],
+        )
+
+    with gr.Tab("5. Video"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                vid_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
+                vid_refresh_btn = gr.Button("Refresh danh sach project")
+                use_subtitle_in = gr.Checkbox(label="Burn phu de", value=True)
+                use_music_in = gr.Checkbox(label="Them nhac nen (neu co file .mp3 trong assets/music/)", value=False)
+                assemble_btn = gr.Button("Ghep video hoan chinh", variant="primary")
+                vid_status = gr.Markdown()
+                gr.Markdown("---")
+                thumb_scene_in = gr.Number(label="Sinh thumbnail tu scene so", value=1, precision=0)
+                thumb_btn = gr.Button("Generate thumbnail")
+                thumb_status = gr.Markdown()
+            with gr.Column(scale=2):
+                video_out = gr.Video(label="Video hoan chinh")
+                thumb_out = gr.Image(label="Thumbnail")
+
+        vid_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[vid_project_in])
+        assemble_btn.click(
+            on_assemble_video,
+            inputs=[vid_project_in, use_subtitle_in, use_music_in],
+            outputs=[video_out, vid_status],
+        )
+        thumb_btn.click(
+            on_generate_thumbnail,
+            inputs=[vid_project_in, thumb_scene_in],
+            outputs=[thumb_out, thumb_status],
         )
 
     with gr.Tab("Projects"):

@@ -1,0 +1,32 @@
+{
+  "scene_files": [
+    "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/why-octopuses-are-the-smartest-animals-in-the-ocean/audio/scene_01.wav",
+    "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/why-octopuses-are-the-smartest-animals-in-the-ocean/audio/scene_02.wav",
+    "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/why-octopuses-are-the-smartest-animals-in-the-ocean/audio/scene_03.wav",
+    "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/why-octopuses-are-the-smartest-animals-in-the-ocean/audio/scene_04.wav"
+  ],
+  "full_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/why-octopuses-are-the-smartest-animals-in-the-ocean/audio/full.wav",
+  "scene_timings": [
+    {
+      "scene_id": 1,
+      "start_sec": 0.0,
+      "end_sec": 20.587
+    },
+    {
+      "scene_id": 2,
+      "start_sec": 20.987,
+      "end_sec": 34.448
+    },
+    {
+      "scene_id": 3,
+      "start_sec": 34.848,
+      "end_sec": 47.499
+    },
+    {
+      "scene_id": 4,
+      "start_sec": 47.899,
+      "end_sec": 59.888
+    }
+  ],
+  "total_duration_sec": 59.888
+}

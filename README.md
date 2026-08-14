@@ -65,6 +65,24 @@ a shared `style_suffix` (see `config.yaml`) is appended to every prompt; no LoRA
 character training (would need a training pipeline + reference images, out of
 scope for now).
 
+### Video assembly + thumbnail (buoi 7-8)
+
+Pure `ffmpeg` subprocess pipeline (no moviepy, to avoid version-API drift):
+Ken Burns zoom per scene image (`zoompan` filter) -> concat -> mux narration audio
+-> burn subtitles (`subtitles` filter). Requires **`ffmpeg-full`** (not the plain
+`ffmpeg` formula) because Homebrew's default `ffmpeg` ships without `libass`/
+`libfreetype`, so it can't burn subtitles or draw text:
+
+```bash
+brew install ffmpeg-full
+```
+
+`modules/video_assembly.py` looks for `ffmpeg-full`'s binary at
+`/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg` first and falls back to `ffmpeg` on PATH.
+
+Optional background music: drop an `.mp3` into `assets/music/` and enable
+"Them nhac nen" in the Video tab.
+
 ## Project structure
 
 - `app.py` - Gradio UI, orchestrates the pipeline
