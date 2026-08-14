@@ -126,6 +126,35 @@ def assemble_video(scenes: list[dict], scene_timings: list[dict], images_dir: Pa
     return str(out_path)
 
 
+def assemble_dialogue_background(scene_timings: list[dict], images_dir: Path, out_path: Path,
+                                  progress_cb=None) -> str:
+    """Dung cho che do Sticker Dialogue: ghep cac anh nen (bg_scene_XX.png) thanh 1 video
+    nen lien tuc (Ken Burns), khop chinh xac voi tong thoi luong audio. Khong co
+    audio/subtitle - do la cac lop rieng nguoi dung tu keo vao CapCut."""
+    cfg = CONFIG["video"]
+    width, height = cfg["resolution"]
+    fps = cfg["fps"]
+
+    work_dir = out_path.parent / "_work_bg"
+    work_dir.mkdir(parents=True, exist_ok=True)
+
+    clip_paths = []
+    for i, scene in enumerate(scene_timings, start=1):
+        next_start = scene_timings[i]["start_sec"] if i < len(scene_timings) else scene["end_sec"]
+        duration = next_start - scene["start_sec"]
+        image_path = images_dir / f"bg_scene_{scene['scene_id']:02d}.png"
+        clip_path = work_dir / f"clip_{scene['scene_id']:02d}.mp4"
+        if progress_cb:
+            progress_cb(i, len(scene_timings), scene["scene_id"])
+        _make_scene_clip(image_path, clip_path, duration=duration, width=width, height=height, fps=fps)
+        clip_paths.append(clip_path)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    _concat_clips(clip_paths, out_path)
+    shutil.rmtree(work_dir, ignore_errors=True)
+    return str(out_path)
+
+
 def generate_thumbnail(image_path: str, out_path: Path, title: str):
     """Tao thumbnail tu 1 anh co san, resize ve chuan YouTube 1280x720 va overlay tieu de."""
     width, height = 1280, 720

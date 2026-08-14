@@ -13,7 +13,7 @@ from modules.character_gen import generate_all_characters, EXPRESSIONS
 from modules.dialogue_script_gen import generate_dialogue_script
 from modules.dialogue_tts_gen import generate_dialogue_audio
 from modules.subtitle_gen import generate_dialogue_srt
-from modules.capcut_export import build_dialogue_draft
+from modules.dialogue_export import export_dialogue_package
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -242,9 +242,10 @@ def on_export_capcut(slug):
         return "Chua chon project."
     d = project_dir(slug)
     try:
+        script = load_script(slug)
         audio_meta = load_audio_meta(slug)
     except FileNotFoundError:
-        return "Chua co audio. Hay sang tab 8. Dialogue Voice generate truoc."
+        return "Chua co du lieu. Hay sang tab 8. Dialogue Voice generate truoc."
 
     missing_bg = [
         s["scene_id"] for s in audio_meta["scene_timings"]
@@ -253,15 +254,13 @@ def on_export_capcut(slug):
     if missing_bg:
         return f"Thieu anh nen cho scene: {missing_bg}. Hay generate o phan tren truoc."
 
-    result = build_dialogue_draft(
-        scene_timings=audio_meta["scene_timings"],
-        line_timings=audio_meta["line_timings"],
-        backgrounds_dir=d / "images",
-        srt_path=d / "subtitle.srt",
-        draft_name=slug,
-        fallback_out_path=d / "capcut_draft.json",
+    result = export_dialogue_package(script, audio_meta, d / "images", d / "export")
+    overlays = "\n".join(f"  - {name}: {p}" for name, p in result["overlays"].items())
+    return (
+        f"Da xuat xong vao: {d / 'export'}\n\n"
+        f"- background.mp4: {result['background']}\n{overlays}\n\n"
+        f"Xem huong dan chi tiet trong file: {result['guide']}"
     )
-    return f"{result['message']}\n\nPath: {result['path']}"
 
 
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
@@ -449,16 +448,18 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
 
     with gr.Tab("9. Export CapCut"):
         gr.Markdown(
-            "Xuat draft CapCut (`.json`) tu du lieu da co (voice, subtitle, anh nen, sticker nhan vat). "
-            "Khong render video o day - mo file draft trong CapCut de tiep tuc chinh sua va export."
+            "Dung san 4 file (khong can dat tay tung doan): `background.mp4` (nen Ken Burns), "
+            "`<Ten>_overlay.mov` cho tung nhan vat (video trong suot, tu doi bieu cam dung luc), "
+            "`audio/full.wav`, va `subtitle.srt` (import truc tiep vao CapCut qua Captions > Import). "
+            "Xem `HUONG_DAN_CAPCUT.md` trong thu muc export de biet cac buoc keo tha cu the."
         )
         with gr.Row():
             with gr.Column(scale=1):
                 ex_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
                 ex_refresh_btn = gr.Button("Refresh danh sach project")
-                ex_export_btn = gr.Button("Export draft CapCut", variant="primary")
+                ex_export_btn = gr.Button("Export goi file cho CapCut", variant="primary")
             with gr.Column(scale=2):
-                ex_status = gr.Textbox(label="Ket qua", lines=6)
+                ex_status = gr.Textbox(label="Ket qua", lines=8)
 
         ex_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[ex_project_in])
         ex_export_btn.click(on_export_capcut, inputs=[ex_project_in], outputs=[ex_status])

@@ -4,8 +4,10 @@ __pycache__/
 .env
 projects/*/audio/
 projects/*/images/
+projects/*/export/
 projects/*/*.mp4
 projects/*/*.wav
+projects/*/*.mov
 .DS_Store
 *.egg-info/
 models/

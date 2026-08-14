@@ -116,9 +116,17 @@ Optional background music: drop an `.mp3` into `assets/music/` and enable
 
 A second, parallel mode alongside the narrator/ffmpeg pipeline above: 2 fixed
 recurring characters (Host/Guest, configured in `config.yaml` -> `characters`)
-have a back-and-forth dialogue instead of one narrator. Final assembly is meant
-to go through CapCut (via `pycapcut`, added in buoi 12) instead of ffmpeg, to
-keep the finishing/export step token-free.
+have a back-and-forth dialogue instead of one narrator. Final assembly happens
+in CapCut (not ffmpeg) to keep the finishing/export step token-free.
+
+**On the CapCut export approach**: we tried generating a native CapCut draft
+programmatically first (`pycapcut`, then `capcut-cli`) so the project would
+just appear in CapCut's project list. Both failed against the installed CapCut
+9.2.0 — its internal draft format (`draft_info.json` + a `Timelines/` folder)
+has moved faster than either open-source library's reverse-engineered schema
+support. Rather than keep chasing a moving, undocumented target, buoi 12
+pivoted to pre-rendering finished video assets via ffmpeg (already reliable)
+that the user drags into CapCut manually — see below.
 
 - `modules/character_gen.py`: draws each character as a simple black-outline
   stick figure (round head, oval torso, jointed limbs) with 5 expressions
@@ -139,18 +147,19 @@ keep the finishing/export step token-free.
 - `modules/image_gen.py` -> `generate_dialogue_backgrounds()` / the "Generate anh
   nen" button in **8. Dialogue Voice**: one background image per scene (flat
   illustration style, no characters — characters are a separate sticker layer).
-- `modules/capcut_export.py` (`pip install pycapcut`): assembles a CapCut draft
-  `.json` with 5 tracks — Background, one video track per character (sticker
-  swaps per line: speaking character shows their line's expression, the other
-  shows `neutral`), Dialogue audio, Subtitle text (via `import_srt`). Generate
-  via **9. Export CapCut** — writes directly into CapCut's own drafts folder
-  (`~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<project-slug>/` on
-  macOS, `%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\` on
-  Windows — Windows path unverified, adjust `default_capcut_drafts_dir()` in
-  `modules/capcut_export.py` if CapCut's actual folder differs there) so the
-  project shows up directly in CapCut's project list — no manual import. Falls
-  back to writing a standalone `capcut_draft.json` in the project folder if
-  that drafts folder isn't found.
+- `modules/dialogue_export.py`: pre-renders finished pieces with ffmpeg into
+  `projects/<slug>/export/`:
+  - `background.mp4` — Ken Burns background track, full video length
+  - `<CharacterName>_overlay.mov` — one per character, transparent (alpha,
+    `qtrle` codec) video with that character's sticker composited at their
+    screen position, switching pose per line (their own expression while
+    speaking, `neutral` otherwise); duration-matched to the full timeline
+  - `HUONG_DAN_CAPCUT.md` — exact drag-and-drop steps
+  
+  Generate via **9. Export CapCut**. The user drags `background.mp4` + each
+  `*_overlay.mov` + `audio/full.wav` onto separate tracks (~4 drags total,
+  regardless of scene/line count — timing is baked in, no per-clip placement)
+  and imports `subtitle.srt` via CapCut's native Captions > Import.
 
 ## Project structure
 
