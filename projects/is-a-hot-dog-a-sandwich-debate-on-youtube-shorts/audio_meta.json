@@ -1,0 +1,133 @@
+{
+  "full_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/full.wav",
+  "line_timings": [
+    {
+      "line_id": 1,
+      "scene_id": 1,
+      "speaker": "Host",
+      "text": "Hey there! Today we’re tackling a question that has been debated by food enthusiasts everywhere: is a hot dog a sandwich?",
+      "expression": "surprised",
+      "start_sec": 0.0,
+      "end_sec": 7.232,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_001.wav"
+    },
+    {
+      "line_id": 2,
+      "scene_id": 1,
+      "speaker": "Guest",
+      "text": "Absolutely! Let’s dive in!",
+      "expression": "happy",
+      "start_sec": 7.532,
+      "end_sec": 9.196,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_002.wav"
+    },
+    {
+      "line_id": 3,
+      "scene_id": 2,
+      "speaker": "Host",
+      "text": "Now, the argument is that both contain meat between bread.",
+      "expression": "neutral",
+      "start_sec": 9.496,
+      "end_sec": 12.739,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_003.wav"
+    },
+    {
+      "line_id": 4,
+      "scene_id": 2,
+      "speaker": "Guest",
+      "text": "True, but sandwiches are typically served open-faced. Hot dogs have a casing!",
+      "expression": "happy",
+      "start_sec": 13.039,
+      "end_sec": 17.732,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_004.wav"
+    },
+    {
+      "line_id": 5,
+      "scene_id": 3,
+      "speaker": "Host",
+      "text": "Okay, but what about the bun? Is it enough to make it a sandwich?",
+      "expression": "neutral",
+      "start_sec": 18.032,
+      "end_sec": 21.509,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_005.wav"
+    },
+    {
+      "line_id": 6,
+      "scene_id": 3,
+      "speaker": "Guest",
+      "text": "In sandwiches, the bread usually touches the top and bottom of the meat. Hot dogs often just slide right in!",
+      "expression": "happy",
+      "start_sec": 21.809,
+      "end_sec": 28.252,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_006.wav"
+    },
+    {
+      "line_id": 7,
+      "scene_id": 4,
+      "speaker": "Host",
+      "text": "I get that. But what about the toppings? They’re basically the same, right?",
+      "expression": "neutral",
+      "start_sec": 28.552,
+      "end_sec": 32.349,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_007.wav"
+    },
+    {
+      "line_id": 8,
+      "scene_id": 4,
+      "speaker": "Guest",
+      "text": "That’s debatable! Some hot dogs have ketchup and mustard; others might just be spicy sausages!",
+      "expression": "happy",
+      "start_sec": 32.649,
+      "end_sec": 38.473,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_008.wav"
+    },
+    {
+      "line_id": 9,
+      "scene_id": 5,
+      "speaker": "Host",
+      "text": "Alright, let’s wrap this up. What’s the final call?",
+      "expression": "neutral",
+      "start_sec": 38.773,
+      "end_sec": 41.525,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_009.wav"
+    },
+    {
+      "line_id": 10,
+      "scene_id": 5,
+      "speaker": "Guest",
+      "text": "Well, it depends on your definition of a sandwich! But in my book, nope—it’s definitely not a sandwich!",
+      "expression": "happy",
+      "start_sec": 41.825,
+      "end_sec": 47.5,
+      "wav_path": "/Users/anhttpova/AndroidStudioProjects/Tools_Edit_Faceless_Audio/projects/is-a-hot-dog-a-sandwich-debate-on-youtube-shorts/audio/line_010.wav"
+    }
+  ],
+  "scene_timings": [
+    {
+      "scene_id": 1,
+      "start_sec": 0.0,
+      "end_sec": 9.196
+    },
+    {
+      "scene_id": 2,
+      "start_sec": 9.496,
+      "end_sec": 17.732
+    },
+    {
+      "scene_id": 3,
+      "start_sec": 18.032,
+      "end_sec": 28.252
+    },
+    {
+      "scene_id": 4,
+      "start_sec": 28.552,
+      "end_sec": 38.473
+    },
+    {
+      "scene_id": 5,
+      "start_sec": 38.773,
+      "end_sec": 47.5
+    }
+  ],
+  "total_duration_sec": 47.5
+}

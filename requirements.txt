@@ -18,6 +18,9 @@ faster-whisper
 # Image gen fallback API (chua dung, de danh khi can)
 # fal-client
 
+# CapCut draft export (Sticker Dialogue mode)
+pycapcut
+
 # --- Image generation backend: chon THEM 1 trong 2 file duoi day theo may ---
 # Mac Apple Silicon:      pip install -r requirements-mac.txt
 # Windows/Linux NVIDIA:   pip install -r requirements-cuda.txt

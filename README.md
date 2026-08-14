@@ -130,9 +130,25 @@ keep the finishing/export step token-free.
   `expression`), normalizing any expression/speaker the LLM gets wrong back to
   a valid one. Generate via the **7. Dialogue Script** tab.
 
-Still to build: per-line dialogue voice generation, duration-based subtitle
-timing (no whisper needed since the text is already known), and CapCut draft
-export.
+- `modules/dialogue_tts_gen.py`: generates one Kokoro wav per line (voice picked
+  per-speaker from `config.yaml` -> `characters`), concatenates to `full.wav`,
+  and returns exact per-line + per-scene timing (no Whisper — the text is
+  already known). Generate via **8. Dialogue Voice**.
+- `modules/subtitle_gen.py` -> `generate_dialogue_srt()`: builds `subtitle.srt`
+  directly from that timing.
+- `modules/image_gen.py` -> `generate_dialogue_backgrounds()` / the "Generate anh
+  nen" button in **8. Dialogue Voice**: one background image per scene (flat
+  illustration style, no characters — characters are a separate sticker layer).
+- `modules/capcut_export.py` (`pip install pycapcut`): assembles a CapCut draft
+  `.json` with 5 tracks — Background, one video track per character (sticker
+  swaps per line: speaking character shows their line's expression, the other
+  shows `neutral`), Dialogue audio, Subtitle text (via `import_srt`). Generate
+  via **9. Export CapCut** — writes `capcut_draft.json` into the project folder.
+  **Not yet placed into an actual CapCut drafts folder** (CapCut isn't installed
+  on this Mac to test against) — for now, manually import/open the generated
+  `.json` in CapCut. Once we know which machine/CapCut install you'll actually
+  use, this can auto-place the draft via `pycapcut`'s `DraftFolder` so it shows
+  up directly in the CapCut project list.
 
 ## Project structure
 

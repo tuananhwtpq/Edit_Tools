@@ -63,3 +63,19 @@ def generate_srt(audio_path: str, out_srt_path, max_words_per_line: int = 7) -> 
             )
 
     return entries
+
+
+def generate_dialogue_srt(line_timings: list[dict], out_srt_path, include_speaker: bool = True) -> list[dict]:
+    """Sinh .srt truc tiep tu timing da biet chinh xac (khong can Whisper), vi voi
+    che do dialogue text moi cau da biet truoc, khong can ASR doan lai."""
+    entries = []
+    with open(out_srt_path, "w") as f:
+        for i, line in enumerate(line_timings, start=1):
+            text = f"{line['speaker']}: {line['text']}" if include_speaker else line["text"]
+            f.write(
+                f"{i}\n"
+                f"{_format_timestamp(line['start_sec'])} --> {_format_timestamp(line['end_sec'])}\n"
+                f"{text}\n\n"
+            )
+            entries.append({"index": i, "start": line["start_sec"], "end": line["end_sec"], "text": text})
+    return entries

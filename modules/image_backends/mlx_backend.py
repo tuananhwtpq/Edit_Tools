@@ -17,10 +17,11 @@ def _get_flux():
 
 
 def generate_image(prompt: str, out_path, seed: int, width: int | None = None,
-                    height: int | None = None, steps: int | None = None) -> str:
+                    height: int | None = None, steps: int | None = None,
+                    style_suffix: str | None = None) -> str:
     flux = _get_flux()
     cfg = CONFIG["image"]
-    full_prompt = f"{prompt}, {cfg['style_suffix']}"
+    full_prompt = f"{prompt}, {style_suffix if style_suffix is not None else cfg['style_suffix']}"
     image = flux.generate_image(
         seed=seed,
         prompt=full_prompt,

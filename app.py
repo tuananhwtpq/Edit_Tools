@@ -7,10 +7,13 @@ from modules.project import slugify, save_script, load_script, save_audio_meta, 
 from modules.script_gen import generate_script
 from modules.tts_gen import generate_scene_audio
 from modules.subtitle_gen import generate_srt
-from modules.image_gen import generate_image
+from modules.image_gen import generate_image, DIALOGUE_BG_STYLE
 from modules.video_assembly import assemble_video, generate_thumbnail
 from modules.character_gen import generate_all_characters, EXPRESSIONS
 from modules.dialogue_script_gen import generate_dialogue_script
+from modules.dialogue_tts_gen import generate_dialogue_audio
+from modules.subtitle_gen import generate_dialogue_srt
+from modules.capcut_export import build_dialogue_draft
 
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -194,6 +197,72 @@ def on_generate_dialogue(topic, duration_min, provider):
     return script_str, f"Da tao dialogue script cho project: **{slug}**", slug
 
 
+def on_generate_dialogue_voice(slug):
+    if not slug:
+        return None, "Chua chon project."
+    try:
+        script = load_script(slug)
+    except FileNotFoundError:
+        return None, f"Khong tim thay script.json cho project '{slug}'."
+    d = project_dir(slug)
+    result = generate_dialogue_audio(script, d / "audio")
+    save_audio_meta(slug, result)
+    generate_dialogue_srt(result["line_timings"], d / "subtitle.srt")
+    return result["full_path"], (
+        f"Da sinh voice cho {len(result['line_timings'])} cau thoai, "
+        f"tong thoi luong {result['total_duration_sec']}s. Subtitle da luu tai subtitle.srt."
+    )
+
+
+def on_generate_dialogue_bg(slug, width, height):
+    if not slug:
+        yield [], "Chua chon project."
+        return
+    try:
+        script = load_script(slug)
+    except FileNotFoundError:
+        yield [], f"Khong tim thay script.json cho project '{slug}'."
+        return
+
+    img_dir = project_dir(slug) / "images"
+    scenes = script["scenes"]
+    gallery = []
+    for i, scene in enumerate(scenes, start=1):
+        yield gallery, f"Dang sinh nen {i}/{len(scenes)} (scene {scene['scene_id']})..."
+        out_path = img_dir / f"bg_scene_{scene['scene_id']:02d}.png"
+        generate_image(scene["background_prompt"], out_path, seed=scene["scene_id"],
+                        width=int(width), height=int(height), style_suffix=DIALOGUE_BG_STYLE)
+        gallery.append((str(out_path), f"Scene {scene['scene_id']}"))
+        yield gallery, f"Da xong {i}/{len(scenes)} anh nen."
+    yield gallery, f"Hoan tat! Da sinh {len(scenes)} anh nen cho project '{slug}'."
+
+
+def on_export_capcut(slug):
+    if not slug:
+        return "Chua chon project."
+    d = project_dir(slug)
+    try:
+        audio_meta = load_audio_meta(slug)
+    except FileNotFoundError:
+        return "Chua co audio. Hay sang tab 8. Dialogue Voice generate truoc."
+
+    missing_bg = [
+        s["scene_id"] for s in audio_meta["scene_timings"]
+        if not (d / "images" / f"bg_scene_{s['scene_id']:02d}.png").exists()
+    ]
+    if missing_bg:
+        return f"Thieu anh nen cho scene: {missing_bg}. Hay generate o phan tren truoc."
+
+    draft_path = build_dialogue_draft(
+        scene_timings=audio_meta["scene_timings"],
+        line_timings=audio_meta["line_timings"],
+        backgrounds_dir=d / "images",
+        srt_path=d / "subtitle.srt",
+        out_path=d / "capcut_draft.json",
+    )
+    return f"Da xuat draft CapCut: {draft_path}\n\nMo CapCut, dung tinh nang import/mo draft de tiep tuc chinh sua."
+
+
 with gr.Blocks(title="Faceless AI Video Studio") as demo:
     gr.Markdown("# Faceless AI Video Studio")
 
@@ -354,6 +423,44 @@ with gr.Blocks(title="Faceless AI Video Studio") as demo:
             outputs=[dlg_script_out, dlg_status_out, dlg_slug_state],
         )
         dlg_save_btn.click(on_save_script, inputs=[dlg_script_out, dlg_slug_state], outputs=[dlg_save_status])
+
+    with gr.Tab("8. Dialogue Voice"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                dv_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
+                dv_refresh_btn = gr.Button("Refresh danh sach project")
+                dv_generate_voice_btn = gr.Button("Generate voice tung cau + subtitle", variant="primary")
+                dv_voice_status = gr.Markdown()
+                gr.Markdown("---")
+                dv_width_in = gr.Dropdown(label="Chieu rong nen", choices=[512, 768, 1024], value=768)
+                dv_height_in = gr.Dropdown(label="Chieu cao nen", choices=[512, 768, 1024], value=768)
+                dv_generate_bg_btn = gr.Button("Generate anh nen tung scene")
+                dv_bg_status = gr.Markdown()
+            with gr.Column(scale=2):
+                dv_audio_out = gr.Audio(label="Audio hoi thoai day du", type="filepath")
+                dv_gallery_out = gr.Gallery(label="Anh nen theo scene", columns=2, object_fit="contain")
+
+        dv_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[dv_project_in])
+        dv_generate_voice_btn.click(on_generate_dialogue_voice, inputs=[dv_project_in],
+                                     outputs=[dv_audio_out, dv_voice_status])
+        dv_generate_bg_btn.click(on_generate_dialogue_bg, inputs=[dv_project_in, dv_width_in, dv_height_in],
+                                  outputs=[dv_gallery_out, dv_bg_status])
+
+    with gr.Tab("9. Export CapCut"):
+        gr.Markdown(
+            "Xuat draft CapCut (`.json`) tu du lieu da co (voice, subtitle, anh nen, sticker nhan vat). "
+            "Khong render video o day - mo file draft trong CapCut de tiep tuc chinh sua va export."
+        )
+        with gr.Row():
+            with gr.Column(scale=1):
+                ex_project_in = gr.Dropdown(label="Project", choices=list_projects(), allow_custom_value=True)
+                ex_refresh_btn = gr.Button("Refresh danh sach project")
+                ex_export_btn = gr.Button("Export draft CapCut", variant="primary")
+            with gr.Column(scale=2):
+                ex_status = gr.Textbox(label="Ket qua", lines=6)
+
+        ex_refresh_btn.click(lambda: gr.update(choices=list_projects()), outputs=[ex_project_in])
+        ex_export_btn.click(on_export_capcut, inputs=[ex_project_in], outputs=[ex_status])
 
     with gr.Tab("6. Characters"):
         gr.Markdown(

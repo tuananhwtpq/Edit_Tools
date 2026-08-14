@@ -1,0 +1,40 @@
+1
+00:00:00,000 --> 00:00:07,232
+Host: Hey there! Today we’re tackling a question that has been debated by food enthusiasts everywhere: is a hot dog a sandwich?
+
+2
+00:00:07,532 --> 00:00:09,196
+Guest: Absolutely! Let’s dive in!
+
+3
+00:00:09,496 --> 00:00:12,739
+Host: Now, the argument is that both contain meat between bread.
+
+4
+00:00:13,039 --> 00:00:17,732
+Guest: True, but sandwiches are typically served open-faced. Hot dogs have a casing!
+
+5
+00:00:18,032 --> 00:00:21,509
+Host: Okay, but what about the bun? Is it enough to make it a sandwich?
+
+6
+00:00:21,809 --> 00:00:28,252
+Guest: In sandwiches, the bread usually touches the top and bottom of the meat. Hot dogs often just slide right in!
+
+7
+00:00:28,552 --> 00:00:32,349
+Host: I get that. But what about the toppings? They’re basically the same, right?
+
+8
+00:00:32,649 --> 00:00:38,473
+Guest: That’s debatable! Some hot dogs have ketchup and mustard; others might just be spicy sausages!
+
+9
+00:00:38,773 --> 00:00:41,525
+Host: Alright, let’s wrap this up. What’s the final call?
+
+10
+00:00:41,825 --> 00:00:47,500
+Guest: Well, it depends on your definition of a sandwich! But in my book, nope—it’s definitely not a sandwich!
+

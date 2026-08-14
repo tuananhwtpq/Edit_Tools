@@ -46,10 +46,11 @@ def _get_pipeline():
 
 
 def generate_image(prompt: str, out_path, seed: int, width: int | None = None,
-                    height: int | None = None, steps: int | None = None) -> str:
+                    height: int | None = None, steps: int | None = None,
+                    style_suffix: str | None = None) -> str:
     pipe = _get_pipeline()
     cfg = CONFIG["image"]
-    full_prompt = f"{prompt}, {cfg['style_suffix']}"
+    full_prompt = f"{prompt}, {style_suffix if style_suffix is not None else cfg['style_suffix']}"
     generator = torch.Generator("cpu").manual_seed(seed)
     image = pipe(
         prompt=full_prompt,
